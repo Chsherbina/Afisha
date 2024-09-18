@@ -32,3 +32,33 @@ class MovieSerializer(serializers.ModelSerializer):
             summ = sum(i.stars for i in reviews)
             mean = round(summ/len(reviews), 1)
             return mean
+
+class MovieValidationSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    description = serializers.CharField()
+    duration = serializers.IntegerField()
+    director_id = serializers.IntegerField()
+
+    def validate_director_id(self, director_id):
+        try:
+            Director.objects.get(pk=director_id)
+        except Director.DoesNotExist:
+            raise serializers.ValidationError("Director does not exist")
+        return director_id
+
+class ReviewValidationSerializer(serializers.Serializer):
+    text = serializers.CharField()
+    stars = serializers.IntegerField()
+    movie_id = serializers.IntegerField()
+
+    def validate_movie_id(self, movie_id):
+        try:
+            Movie.objects.get(pk=movie_id)
+        except Movie.DoesNotExist:
+            raise serializers.ValidationError("Movie does not exist")
+        return movie_id
+
+
+class DirectorValidationSerializer(serializers.Serializer):
+    name = serializers.CharField()
+
